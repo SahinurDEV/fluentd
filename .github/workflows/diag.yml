@@ -17,8 +17,11 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - name: Run the failing sub test case 3 times
+      - name: Run the new #5627 concurrency tests 5 times
         run: |
-          for i in 1 2 3; do
-            bundle exec ruby -w -Ilib -Itest test/plugin/test_out_forward.rb -t "/never sends the ack/" -v || true
+          for i in 1 2 3 4 5; do
+            bundle exec ruby -w -Ilib -Itest test/plugin/test_out_forward.rb -t "/late ack failure|concurrent rebuilds|a failed ack|never sends the ack/"
           done
+      - name: Run all out_forward tests
+        run: |
+          bundle exec ruby -w -Ilib -Itest -e 'ARGV.each { |f| require File.expand_path(f) }' test/plugin/test_out_forward.rb test/plugin/out_forward/*.rb
