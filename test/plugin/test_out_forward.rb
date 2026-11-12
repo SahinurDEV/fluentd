@@ -1734,6 +1734,11 @@ EOL
         silent.instance_shutdown
       end
 
+      if delivered.call != tags
+        puts '=== DIAG logs (missing chunks) ==='
+        puts((logs || d.logs).join)
+        puts '=== DIAG end ==='
+      end
       assert_equal tags, delivered.call
       assert{ logs.any? { |log| log.include?("detached forwarding server 'silent'") } }
       assert{ logs.none? { |log| log.include?('Hit limit for retries') } }

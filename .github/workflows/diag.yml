@@ -1,0 +1,24 @@
+name: Diag 5619
+on:
+  push:
+    branches: [diag-5619-macos]
+permissions: read-all
+jobs:
+  diag:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ['3.3', '4.0']
+        attempt: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+      - name: Run the failing sub test case 3 times
+        run: |
+          for i in 1 2 3; do
+            bundle exec ruby -w -Ilib -Itest test/plugin/test_out_forward.rb -t "/never sends the ack/" -v || true
+          done
